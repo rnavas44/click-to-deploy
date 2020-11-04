@@ -1,6 +1,7 @@
 #!/bin/bash
 
 << comment
+These variables are yet to be defined
 ${MOODLE_UPGRADE_KEY} * need to include
 ${MOODLE_DB_SOCKET} * need to include
 ${MOODLE_DB_PREFIX} * need to include
@@ -18,7 +19,7 @@ fi
 
 
 
-MOODLE_HOST_URL=$(curl -s ifconfig.me):8080 # TODO Check this part
+MOODLE_HOST_URL=http://$(curl -s ifconfig.me):8080 # TODO Check this part
 
 if [[ -z ${MOODLE_DATA_ROOT_PERMISSION} ]]; then
   MOODLE_DATA_ROOT_PERMISSION='2777'
@@ -77,7 +78,6 @@ if [[ -z ${MOODLE_SITE_SHORTNAME} ]]; then
   exit 1
 fi
 
-# TODO check how to continue flow when MOODLE_SITE_SUMMARY unset
 if [[ -z ${MOODLE_SITE_SUMMARY} ]]; then
   echo >&2 "error: missing optional MOODLE_SITE_SUMMARY environment variable"
   echo >&2 "  Did you forget to -e MOODLE_SITE_SUMMARY=... ?"
@@ -90,10 +90,10 @@ fi
 
 # Installs DB if MOODLE_DB_SKIP=false otherwise it stops the installation before installing the DB
 if [[ "${MOODLE_DB_SKIP}" = "true" ]]; then
-  # TODO execute install without DB
+  # Execute install without DB
   /usr/local/bin/php /var/www/html/admin/cli/install.php \
     --agree-license \
-    --non-interactive \ 
+    --non-interactive \
     --allow-unstable \
     --wwwroot=${MOODLE_HOST_URL} \
     --lang=${MOODLE_LANGUAGE} \
@@ -102,11 +102,11 @@ if [[ "${MOODLE_DB_SKIP}" = "true" ]]; then
     --adminuser=${MOODLE_ADMIN_USER} \
     --adminemail=${MOODLE_ADMIN_EMAIL} \
     --adminpass=${MOODLE_ADMIN_PASSWORD} \
-    --fullname=\"${MOODLE_SITE_FULLNAME}\" \
+    --fullname="${MOODLE_SITE_FULLNAME}" \
     --shortname=${MOODLE_SITE_SHORTNAME} \
-    --summary=\"${MOODLE_SITE_SUMMARY}\" \
+    --summary="${MOODLE_SITE_SUMMARY}" \
     --skip-database
-    
+
   # Checks for DB necessary data
   else
     echo "Entering..."
@@ -115,11 +115,11 @@ if [[ "${MOODLE_DB_SKIP}" = "true" ]]; then
     else
       MOODLE_DB_USERNAME='moodle'
     fi
-      
+
     if [[ -n ${POSTGRES_PASSWORD} ]]; then
       : ${MOODLE_DB_PASSWORD:=${POSTGRES_PASSWORD}}
     else
-      MOODLE_DB_PASSWORD='password' # Random generated password      
+      MOODLE_DB_PASSWORD='password' # TODO Random generated password
     fi
 
     if [[ -n ${POSTGRES_DB} ]]; then
@@ -127,15 +127,15 @@ if [[ "${MOODLE_DB_SKIP}" = "true" ]]; then
     else
       MOODLE_DB_NAME='moodle'
     fi
-  
+
     if [[ -z ${MOODLE_DB_PREFIX} ]]; then
       MOODLE_DB_PREFIX='mdl_'
     fi
-      
+
     MOODLE_DB_HOST='db'
     MOODLE_DB_PORT=5432
-    
-    
+
+
     /usr/local/bin/php /var/www/html/admin/cli/install.php \
     --agree-license \
     --non-interactive \
@@ -147,9 +147,9 @@ if [[ "${MOODLE_DB_SKIP}" = "true" ]]; then
     --adminuser=${MOODLE_ADMIN_USER} \
     --adminemail=${MOODLE_ADMIN_EMAIL} \
     --adminpass=${MOODLE_ADMIN_PASSWORD} \
-    --fullname=\"${MOODLE_SITE_FULLNAME}\" \
+    --fullname="${MOODLE_SITE_FULLNAME}" \
     --shortname=${MOODLE_SITE_SHORTNAME} \
-    --summary="\""${MOODLE_SITE_SUMMARY}"\"" \
+    --summary="${MOODLE_SITE_SUMMARY}" \
     --dbtype=pgsql \
     --dbhost=${MOODLE_DB_HOST} \
     --dbname=${MOODLE_DB_NAME} \
@@ -160,6 +160,6 @@ if [[ "${MOODLE_DB_SKIP}" = "true" ]]; then
     #--prefix=${MOODLE_DB_PREFIX}
 fi
 
-chown -R www-data:www-data /var/www/moodledata
+chown -R www-data:www-data /var/www/
 
 exec "$@"

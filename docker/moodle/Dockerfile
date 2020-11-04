@@ -80,8 +80,8 @@ RUN set -eux; \
 VOLUME /var/www/html
  
 # Copy init scripts
-#COPY docker-entrypoint.sh /entrypoint.sh 
-#RUN chmod +x /entrypoint.sh
+COPY docker-entrypoint.sh /entrypoint.sh 
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
